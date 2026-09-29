@@ -13,7 +13,6 @@
   --teal-dark: #075248;
   --ink: #111116;
   --gold: #f7d64a;
-  --gold-dark: #b89614;
 }
 
 * {
@@ -36,6 +35,7 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  padding-bottom: 20px;
 }
 
 #wrap {
@@ -49,45 +49,46 @@ canvas {
   height: auto;
   touch-action: none;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
   background: #181820;
 }
 
 #hud {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   width: min(100vw, 900px);
   padding: 10px 14px;
-  font-size: 14px;
-  background: rgba(20, 20, 28, 0.85);
+  font-size: 13px;
+  background: rgba(20, 20, 28, 0.95);
   border-radius: 8px;
   margin-bottom: 8px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  flex-wrap: wrap;
 }
 
 #hud b {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--gold);
 }
 
 #status-pill {
-  padding: 4px 14px;
+  padding: 4px 12px;
   border-radius: 999px;
   font-weight: 900;
   letter-spacing: .06em;
   background: #333;
-  min-width: 160px;
+  min-width: 140px;
   text-align: center;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 #action-btn {
   width: min(92vw, 600px);
-  margin: 10px 0 16px;
+  margin: 12px 0 16px;
   padding: 18px;
   border: 0;
   border-radius: 16px;
@@ -97,7 +98,7 @@ canvas {
   touch-action: none;
   box-shadow: 0 6px 0 var(--pink-dark);
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 #action-btn:active, #action-btn.on {
@@ -108,8 +109,8 @@ canvas {
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(15, 15, 22, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(12, 12, 18, 0.95);
+  backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -119,12 +120,6 @@ canvas {
   gap: 14px;
   border-radius: 12px;
   z-index: 10;
-  animation: fadeIn 0.25s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
 }
 
 .overlay.hide {
@@ -152,7 +147,6 @@ canvas {
 .btn-primary:hover {
   background: #ff2a89;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(237, 27, 118, 0.6);
 }
 
 .btn-secondary {
@@ -163,21 +157,14 @@ canvas {
   color: #ccc;
   font: 800 15px "Trebuchet MS", Verdana, sans-serif;
   cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-secondary:hover {
-  border-color: #fff;
-  color: #fff;
-  background: rgba(255,255,255,0.1);
 }
 
 #elim-log-box {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 240px;
-  max-height: 160px;
+  width: 250px;
+  max-height: 180px;
   overflow-y: hidden;
   pointer-events: none;
   display: flex;
@@ -187,11 +174,11 @@ canvas {
 }
 
 .elim-toast {
-  background: rgba(237, 27, 118, 0.85);
+  background: rgba(237, 27, 118, 0.9);
   color: #fff;
   font-size: 11px;
   font-weight: bold;
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   animation: slideIn 0.2s ease-out;
@@ -218,16 +205,15 @@ canvas {
   <canvas id="c" width="900" height="640"></canvas>
   <div id="elim-log-box"></div>
 
-  <!-- MAIN MENU -->
+  <!-- MAIN MENU OVERLAY -->
   <div id="ov-menu" class="overlay">
     <div class="squid-shapes">○ △ □</div>
     <h1 class="text-4xl sm:text-6xl font-black text-[var(--pink)] tracking-wider">SQUID GAME</h1>
-    <p class="text-gray-300 max-w-md text-sm">Survive 6 synced lethal challenges. Wait for rounds to finish or be eliminated.</p>
+    <p class="text-gray-300 max-w-md text-xs sm:text-sm">Survive all 6 synchronized lethal games. You must wait for all NPCs to finish each round. One failure sends you back to Game 1!</p>
     
-    <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left max-w-md w-full text-xs space-y-2">
-      <div class="font-bold text-pink-400 text-sm">🎭 Official Player Roster Active:</div>
-      <p class="text-gray-300">15 Preset NPC Competitors loaded (`images/*.jpeg`). Player 456 (YOU) competes for <b>₩45.6 Billion</b>!</p>
-      <div id="loaded-roster-status" class="text-green-400 font-mono font-bold text-center">Roster Initialized (15 NPC JPEG Avatars Mapped)</div>
+    <div class="bg-black/60 p-4 rounded-xl border border-white/10 text-left max-w-md w-full text-xs space-y-2">
+      <div class="font-bold text-pink-400 text-sm">🎭 Official NPC Competitor Roster:</div>
+      <p class="text-gray-300">15 Preset NPC JPEGs (`Hanbo`, `asher`, `callum`, `gerard`, etc.). Player 456 (YOU) has a unique golden badge. Automatic procedural avatar fallback enabled if images are missing.</p>
     </div>
 
     <div class="flex gap-3">
@@ -239,28 +225,28 @@ canvas {
   <!-- INSTRUCTIONS OVERLAY -->
   <div id="ov-how" class="overlay hide">
     <div class="squid-shapes">○ △ □</div>
-    <h1 class="text-3xl font-black text-white">SYNCHRONIZED CHALLENGES</h1>
-    <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left max-w-lg w-full text-xs space-y-2 max-h-[320px] overflow-y-auto">
-      <p><b class="text-pink-400">1. Red Light Green Light (60s):</b> Move on Green. Crossing early makes you wait while surviving NPCs finish or die!</p>
-      <p><b class="text-pink-400">2. Dalgona Honeycomb (50s):</b> Precise multi-segment carving without building excess needle pressure.</p>
-      <p><b class="text-pink-400">3. Tug of War:</b> Multi-round rhythm pull matches. Must win your heat and wait for tournament simulation.</p>
-      <p><b class="text-pink-400">4. Marbles (Best of 5):</b> Predict rival holdings in extended wagering rounds.</p>
-      <p><b class="text-pink-400">5. Glass Bridge (12 Pairs):</b> Step through alternating panels with live turn-order updates.</p>
-      <p><b class="text-pink-400">6. Squid Game (Final Boss):</b> Multi-stage defense vs the main rival guard.</p>
+    <h1 class="text-3xl font-black text-white">THE 6 CHALLENGES</h1>
+    <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left max-w-lg w-full text-xs space-y-2 max-h-[300px] overflow-y-auto">
+      <p><b class="text-pink-400">1. Red Light, Green Light:</b> Hold to run on Green. When safe, you MUST WAIT for all other NPCs to finish or die!</p>
+      <p><b class="text-pink-400">2. Dalgona Honeycomb:</b> Trace the shape smoothly without exceeding needle pressure.</p>
+      <p><b class="text-pink-400">3. Tug of War:</b> Tap in rhythm when meter hits the green sweet-spot. Win your match and watch rival results.</p>
+      <p><b class="text-pink-400">4. Marbles:</b> Predict rival holdings over 5 wager rounds.</p>
+      <p><b class="text-pink-400">5. Glass Bridge:</b> Step across 12 tempered glass panels in sequential turn order.</p>
+      <p><b class="text-pink-400">6. Squid Game:</b> Final boss showdown vs top NPC guard.</p>
     </div>
     <button id="btn-close-how" class="btn-primary">BACK TO MENU</button>
   </div>
 
-  <!-- STAGE TRANSITION -->
+  <!-- STAGE TRANSITION OVERLAY -->
   <div id="ov-stage" class="overlay hide">
     <div class="squid-shapes text-yellow-400">○ △ □</div>
     <h2 id="stage-num" class="text-pink-400 font-bold tracking-widest text-lg">STAGE 2 OF 6</h2>
-    <h1 id="stage-title" class="text-4xl font-black text-white">DALGONA HONEYCOMB</h1>
-    <p id="stage-desc" class="text-gray-300 max-w-md text-sm">Carve the shape out without breaking the needle!</p>
+    <h1 id="stage-title" class="text-3xl sm:text-4xl font-black text-white">DALGONA HONEYCOMB</h1>
+    <p id="stage-desc" class="text-gray-300 max-w-md text-sm">Carve out the shape without snapping the candy needle!</p>
 
     <div class="bg-black/50 p-4 rounded-xl border border-yellow-500/30 w-64 text-sm space-y-1 my-2">
-      <div class="flex justify-between"><span>Remaining Players:</span> <b id="trans-alive" class="text-green-400">212</b></div>
-      <div class="flex justify-between"><span>Current Piggybank:</span> <b id="trans-prize" class="text-yellow-400">₩24.4B</b></div>
+      <div class="flex justify-between"><span>Remaining Field:</span> <b id="trans-alive" class="text-green-400">212</b></div>
+      <div class="flex justify-between"><span>Current Prize:</span> <b id="trans-prize" class="text-yellow-400">₩24.4B</b></div>
     </div>
 
     <button id="btn-begin-stage" class="btn-primary">BEGIN STAGE</button>
@@ -284,20 +270,20 @@ canvas {
     </div>
   </div>
 
-  <!-- DEFEAT OVERLAY -->
+  <!-- DEFEAT OVERLAY (PERMADEATH RESET) -->
   <div id="ov-loss" class="overlay hide">
     <div class="squid-shapes text-red-500">✕ ✕ ✕</div>
     <h1 class="text-4xl sm:text-6xl font-black text-red-500">ELIMINATED</h1>
     <p id="loss-reason" class="text-red-200 font-semibold max-w-md text-sm">You failed the challenge.</p>
 
     <div class="bg-black/50 p-4 rounded-xl border border-red-500/30 w-72 text-sm space-y-1">
-      <div class="flex justify-between"><span>Died on Stage:</span> <b id="loss-stage-name" class="text-pink-400">Stage 1</b></div>
-      <div class="flex justify-between"><span>Surviving Field:</span> <b id="loss-survivors" class="text-white">0 / 456</b></div>
-      <div class="text-xs text-red-400 border-t border-red-500/20 pt-1 mt-1 text-center font-bold">Permadeath: Restarting will take you back to Main Menu</div>
+      <div class="flex justify-between"><span>Eliminated Stage:</span> <b id="loss-stage-name" class="text-pink-400">Stage 1</b></div>
+      <div class="flex justify-between"><span>Final Field:</span> <b id="loss-survivors" class="text-white">0 / 456</b></div>
+      <div class="text-xs text-red-400 border-t border-red-500/20 pt-1 mt-1 text-center font-bold">High-Stakes Reset: Returning to Main Menu</div>
     </div>
 
     <div class="flex gap-4 mt-2">
-      <button id="btn-loss-menu" class="btn-primary">MAIN MENU</button>
+      <button id="btn-loss-menu" class="btn-primary">RETURN TO MAIN MENU</button>
     </div>
   </div>
 </div>
@@ -305,34 +291,22 @@ canvas {
 <button id="action-btn">HOLD TO RUN</button>
 
 <script>
-const W=900, H=640;
+const W = 900, H = 640;
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 const $ = id => document.getElementById(id);
 
-// FIXED PRESET ROSTER (ONE IMAGE PER CHARACTER, PLAYER 456 NO IMAGE)
-const NPC_PRESETS = [
-  { name: 'Hanbo', file: 'images/Hanbo.jpeg' },
-  { name: 'Asher', file: 'images/asher.jpeg' },
-  { name: 'Callum', file: 'images/callum.jpeg' },
-  { name: 'Gerard', file: 'images/gerard.jpeg' },
-  { name: 'Guangyan', file: 'images/guangyan.jpeg' },
-  { name: 'Ivan', file: 'images/ivan.jpeg' },
-  { name: 'Jason', file: 'images/jason.jpeg' },
-  { name: 'Liu-Ji', file: 'images/liu-ji.jpeg' },
-  { name: 'Matthew', file: 'images/matthew.jpeg' },
-  { name: 'Travia', file: 'images/travia.jpeg' },
-  { name: 'Travis', file: 'images/travis.jpeg' },
-  { name: 'Winston', file: 'images/winston.jpeg' },
-  { name: 'Xayven', file: 'images/xayven.jpeg' },
-  { name: 'Xuchen', file: 'images/xuchen.jpeg' },
-  { name: 'Yichen', file: 'images/yichen.jpeg' }
+const PRESET_FILES = [
+  'Hanbo', 'asher', 'callum', 'gerard', 'guangyan', 
+  'ivan', 'jason', 'liu-ji', 'matthew', 'travia', 
+  'travis', 'winston', 'xayven', 'xuchen', 'yichen'
 ];
 
-const loadedJpegImgs = {};
-NPC_PRESETS.forEach(npc => {
+const npcImages = {};
+PRESET_FILES.forEach(name => {
   const img = new Image();
-  img.src = npc.file;
-  loadedJpegImgs[npc.name] = img;
+  img.src = `images/${name}.jpeg`;
+  img.onload = () => { npcImages[name] = { img, loaded: true }; };
+  img.onerror = () => { npcImages[name] = { img: null, loaded: false }; };
 });
 
 // Audio Synthesizer
@@ -355,19 +329,19 @@ const soundShot = () => { tone(80, 0.25, 'sawtooth', 0.25); tone(45, 0.3, 'squar
 const soundWin = () => { tone(523, 0.15); setTimeout(()=>tone(659, 0.15), 150); setTimeout(()=>tone(783, 0.3), 300); };
 const soundFail = () => { tone(200, 0.2, 'sawtooth'); setTimeout(()=>tone(150, 0.4, 'sawtooth'), 200); };
 
-// Elimination Ticker System
+// Live Elimination HUD Feed
 function announceElimination(name, playerNum) {
   const box = $('elim-log-box');
   if (!box) return;
   const el = document.createElement('div');
   el.className = 'elim-toast';
-  el.textContent = `💀 ${name} (#${playerNum}) was ELIMINATED!`;
+  el.textContent = `💀 ${name} (#${playerNum}) WAS ELIMINATED!`;
   box.prepend(el);
   if (box.children.length > 5) box.removeChild(box.lastChild);
   setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 4000);
 }
 
-// Game State Engine
+// Global Game Engine State
 let currentStage = 1;
 let totalAlive = 456;
 let held = false;
@@ -389,17 +363,16 @@ function initStage1() {
   const START = H - 85;
   const players = [];
   
-  // Assign 15 specific NPCs and 1 Player 456
-  NPC_PRESETS.forEach((npc, i) => {
+  PRESET_FILES.forEach((name, i) => {
     players.push({
-      x: 60 + i * (W - 120) / 15,
+      x: 50 + i * (W - 100) / 15,
       y: START + Math.random() * 16 - 8,
       you: false,
-      name: npc.name,
-      num: 101 + i * 23,
-      speed: 75 + Math.random() * 35,
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      rawName: name,
+      num: 101 + i * 22,
+      speed: 70 + Math.random() * 30,
       st: 'alive',
-      img: loadedJpegImgs[npc.name],
       delay: Math.random() * 0.4,
       was: false,
       goAt: 0,
@@ -407,16 +380,15 @@ function initStage1() {
     });
   });
 
-  // YOU (Player 456)
+  // Player 456 (YOU) - Center position, Golden badge, NO photo
   players.splice(7, 0, {
     x: W / 2,
     y: START,
     you: true,
     name: 'Player 456',
     num: 456,
-    speed: 110,
+    speed: 105,
     st: 'alive',
-    img: null, // NO IMAGE for Player 456
     delay: 0,
     was: false,
     goAt: 0,
@@ -427,13 +399,12 @@ function initStage1() {
     name: 'Red Light Green Light',
     phase: 'green',
     phaseT: 0,
-    phaseDur: 3,
+    phaseDur: 3.2,
     headTurn: 0,
     players: players,
     beams: [],
     endT: null,
-    reason: '',
-    youFinishedWaiting: false
+    reason: ''
   };
   timer = 60;
   $('action-btn').textContent = "HOLD TO RUN";
@@ -448,30 +419,31 @@ function updateStage1(dt) {
 
   if (d.phase === 'green') {
     if (d.phaseT >= d.phaseDur) {
-      d.phase = 'red'; d.phaseT = 0; d.phaseDur = 2.2 + Math.random() * 2.0;
+      d.phase = 'red'; d.phaseT = 0; d.phaseDur = 2.0 + Math.random() * 1.8;
       tone(220, 0.3, 'square', 0.08);
-      d.players.forEach(p => { p.was = p.mv; p.delay = 0.08 + Math.random() * 0.35; });
+      d.players.forEach(p => { p.was = p.mv; p.delay = 0.12 + Math.random() * 0.4; });
     }
   } else {
     if (d.phaseT >= d.phaseDur) {
-      d.phase = 'green'; d.phaseT = 0; d.phaseDur = 2.5 + Math.random() * 2.8;
+      d.phase = 'green'; d.phaseT = 0; d.phaseDur = 2.5 + Math.random() * 2.5;
       tone(660, 0.15);
-      d.players.forEach(p => { p.goAt = Math.random() * 0.45; });
+      d.players.forEach(p => { p.goAt = Math.random() * 0.5; });
     }
   }
 
-  d.headTurn += Math.max(-dt/0.3, Math.min(dt/0.3, (d.phase==='red'?1:0) - d.headTurn));
+  d.headTurn += Math.max(-dt/0.35, Math.min(dt/0.35, (d.phase==='red'?1:0) - d.headTurn));
 
-  let youPlayer = d.players.find(p => p.you);
+  const youPlayer = d.players.find(p => p.you);
 
-  // Update ALL players (even after player reaches finish line!)
+  // Update ALL players continuously (MUST WAIT for everyone to finish)
   d.players.forEach(p => {
     if (p.st !== 'alive') return;
     let mv = p.you ? held : (d.phase === 'green' ? (d.phaseT >= p.goAt) : (p.was && d.phaseT < p.delay));
 
-    if (d.phase === 'red' && d.phaseT > 0.35 && mv) {
+    // Grace period on Red Light
+    if (d.phase === 'red' && d.phaseT > 0.45 && mv) {
       p.st = 'dead';
-      d.beams.push({x: p.x, y: p.y, t: 0.3});
+      d.beams.push({ x: p.x, y: p.y, t: 0.3 });
       soundShot();
       announceElimination(p.name, p.num);
       totalAlive--;
@@ -484,15 +456,12 @@ function updateStage1(dt) {
       if (p.y <= 125) {
         p.y = 125; p.st = 'safe';
         tone(880, 0.1);
-        if (p.you) {
-          d.youFinishedWaiting = true;
-        }
       }
     }
     p.mv = mv;
   });
 
-  // Check if ALL players are done (Safe or Dead)
+  // Check if round is completely done (All players either safe or dead, or time run out)
   const activePlayers = d.players.filter(p => p.st === 'alive');
   if (activePlayers.length === 0 || timer <= 0) {
     if (timer <= 0) {
@@ -501,7 +470,7 @@ function updateStage1(dt) {
           p.st = 'dead';
           announceElimination(p.name, p.num);
           totalAlive--;
-          if (p.you) d.reason = 'Time expired before reaching line!';
+          if (p.you) d.reason = 'Time expired before reaching finish line!';
         }
       });
     }
@@ -509,7 +478,7 @@ function updateStage1(dt) {
     if (d.endT === null) {
       d.endT = 1.0;
       if (youPlayer.st === 'safe') d.reason = 'safe';
-      else if (!d.reason) d.reason = 'Eliminated on Red Light!';
+      else if (!d.reason) d.reason = 'Eliminated during Red Light!';
     }
   }
 
@@ -527,7 +496,7 @@ function drawStage1() {
   ctx.fillStyle = '#d9b382'; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = '#8fd3e8'; ctx.fillRect(0, 0, W, 120);
 
-  // Finish line
+  // Finish and Start lines
   ctx.fillStyle = '#e0213b'; ctx.fillRect(0, 115, W, 10);
   ctx.fillStyle = '#fff'; ctx.fillRect(0, H - 50, W, 4);
 
@@ -543,21 +512,28 @@ function drawStage1() {
   }
   ctx.restore();
 
-  // Draw Players
+  // Draw Players with Procedural Fallbacks
   d.players.forEach(p => {
-    ctx.fillStyle = p.st === 'dead' ? '#444' : (p.you ? '#ffd84a' : '#0f9a86');
+    const isDead = p.st === 'dead';
+    ctx.fillStyle = isDead ? '#444' : (p.you ? '#ffd84a' : '#0f9a86');
     ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, 7); ctx.fill();
     
-    if (!p.you && p.img && p.st !== 'dead') {
-      ctx.save(); ctx.beginPath(); ctx.arc(p.x, p.y, 12, 0, 7); ctx.clip();
-      ctx.drawImage(p.img, p.x - 12, p.y - 12, 24, 24); ctx.restore();
+    if (!p.you && !isDead) {
+      const asset = npcImages[p.rawName];
+      if (asset && asset.loaded) {
+        ctx.save(); ctx.beginPath(); ctx.arc(p.x, p.y, 12, 0, 7); ctx.clip();
+        ctx.drawImage(asset.img, p.x - 12, p.y - 12, 24, 24); ctx.restore();
+      } else {
+        // Fallback procedural avatar
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(p.name.charAt(0), p.x, p.y + 4);
+      }
     } else if (p.you) {
-      // Golden Badge for 456
       ctx.fillStyle = '#111'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText("456", p.x, p.y + 3);
     }
 
-    ctx.fillStyle = p.st === 'dead' ? '#888' : '#fff'; 
+    ctx.fillStyle = isDead ? '#888' : '#fff'; 
     ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(p.you ? "YOU" : p.name, p.x, p.y + 24);
   });
@@ -570,14 +546,14 @@ function drawStage1() {
   }
   d.beams = d.beams.filter(b => b.t > 0);
 
-  // Waiting banner when Player 456 is already safe
-  if (d.youFinishedWaiting && d.endT === null) {
-    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(W/2 - 200, 140, 400, 40);
-    ctx.fillStyle = '#ffd84a'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText("YOU ARE SAFE! WAITING FOR OTHERS TO FINISH...", W/2, 165);
+  // Synchronized Wait Banner when Player 456 is already safe
+  const youPlayer = d.players.find(p => p.you);
+  if (youPlayer && youPlayer.st === 'safe' && d.endT === null) {
+    ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillRect(W/2 - 220, 140, 440, 40);
+    ctx.fillStyle = '#ffd84a'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText("YOU ARE SAFE - WAITING FOR OTHER PLAYERS TO FINISH...", W/2, 165);
   }
 
-  // Status HUD Pill
   $('status-pill').textContent = d.phase === 'red' ? 'RED LIGHT' : 'GREEN LIGHT';
   $('status-pill').style.background = d.phase === 'red' ? '#e0213b' : '#12a150';
 }
@@ -597,7 +573,8 @@ function initStage2() {
     progress: 0,
     tension: 0,
     cursor: { x: path[0].x, y: path[0].y },
-    npcElimTimer: 8.0
+    youFinished: false,
+    npcTimer: 6.0
   };
   timer = 50;
   $('action-btn').style.display = "none";
@@ -607,26 +584,26 @@ function initStage2() {
 function updateStage2(dt) {
   const d = stageData;
   timer -= dt;
-  d.npcElimTimer -= dt;
+  d.npcTimer -= dt;
 
-  // Background NPC Eliminations during turn
-  if (d.npcElimTimer <= 0) {
-    d.npcElimTimer = 6.0 + Math.random() * 5.0;
-    const randomNpc = NPC_PRESETS[Math.floor(Math.random() * NPC_PRESETS.length)];
-    announceElimination(randomNpc.name, Math.floor(Math.random() * 300 + 100));
+  // Simulate NPC eliminations in background
+  if (d.npcTimer <= 0) {
+    d.npcTimer = 5.0 + Math.random() * 4.0;
+    const randomNpc = PRESET_FILES[Math.floor(Math.random() * PRESET_FILES.length)];
+    announceElimination(randomNpc, Math.floor(Math.random() * 300 + 100));
     totalAlive--;
   }
 
-  if (timer <= 0 && d.progress < 1) {
-    failStage("Honeycomb time expired!");
+  if (timer <= 0 && !d.youFinished) {
+    failStage("Time expired before completing honeycomb!");
     return;
   }
 
   d.tension = Math.max(0, d.tension - dt * 0.22);
 
-  if (d.tension >= 1) {
+  if (d.tension >= 1 && !d.youFinished) {
     soundFail();
-    failStage("The candy honeycomb cracked under pressure!");
+    failStage("The candy honeycomb cracked under excessive pressure!");
   }
 }
 
@@ -636,7 +613,7 @@ function drawStage2() {
   ctx.fillStyle = '#d4a259'; ctx.beginPath(); ctx.arc(W/2, H/2 + 20, 180, 0, 7); ctx.fill();
   ctx.strokeStyle = '#b88338'; ctx.lineWidth = 10; ctx.stroke();
 
-  // Path outline
+  // Pattern outline
   ctx.strokeStyle = '#7c541e'; ctx.lineWidth = 14; ctx.beginPath();
   d.path.forEach((pt, i) => { if (i === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y); });
   ctx.closePath(); ctx.stroke();
@@ -662,6 +639,12 @@ function drawStage2() {
   ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
   ctx.fillText("NEEDLE PRESSURE / TENSION", W/2, 62);
 
+  if (d.youFinished) {
+    ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(W/2 - 200, H - 70, 400, 40);
+    ctx.fillStyle = '#12a150'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText("SHAPE COMPLETED! WAITING FOR FIELD TO FINISH...", W/2, H - 45);
+  }
+
   $('status-pill').textContent = "CARVE CAREFULLY";
   $('status-pill').style.background = "#0f9a86";
 }
@@ -670,14 +653,13 @@ function initStage3() {
   stageData = {
     name: 'Tug of War',
     ropeX: 0,
-    targetZone: { min: 0.42, max: 0.68 },
+    targetZone: { min: 0.40, max: 0.70 },
     meter: 0,
     meterDir: 1,
     roundsWon: 0,
     requiredRounds: 3,
-    phase: 'match', // 'match' or 'waiting_others'
-    waitTimer: 0,
-    opponents: ['Xayven', 'Matthew', 'Callum']
+    phase: 'match',
+    waitTimer: 0
   };
   timer = 40;
   $('action-btn').textContent = "TAP SPACE / SCREEN ON GREEN";
@@ -694,10 +676,10 @@ function updateStage3(dt) {
     if (d.meter > 1) { d.meter = 1; d.meterDir = -1; }
     if (d.meter < 0) { d.meter = 0; d.meterDir = 1; }
 
-    d.ropeX -= dt * 14;
+    d.ropeX -= dt * 12;
 
     if (d.ropeX <= -100) {
-      failStage("Your team was pulled off the high platform!");
+      failStage("Your team was pulled off the platform!");
     } else if (d.ropeX >= 100) {
       d.roundsWon++;
       d.ropeX = 0;
@@ -709,8 +691,8 @@ function updateStage3(dt) {
     }
   } else if (d.phase === 'waiting_others') {
     d.waitTimer -= dt;
-    if (Math.random() < 0.05) {
-      const opp = d.opponents[Math.floor(Math.random() * d.opponents.length)];
+    if (Math.random() < 0.08) {
+      const opp = PRESET_FILES[Math.floor(Math.random() * PRESET_FILES.length)];
       announceElimination(opp, Math.floor(Math.random() * 200 + 100));
       totalAlive -= 5;
     }
@@ -726,10 +708,10 @@ function handleTugTap() {
   if (currentStage !== 3 || !gameRunning || stageData.phase !== 'match') return;
   const d = stageData;
   if (d.meter >= d.targetZone.min && d.meter <= d.targetZone.max) {
-    d.ropeX += 18;
+    d.ropeX += 20;
     tone(523, 0.1);
   } else {
-    d.ropeX -= 10;
+    d.ropeX -= 12;
     tone(180, 0.1, 'sawtooth');
   }
 }
@@ -738,7 +720,7 @@ function drawStage3() {
   const d = stageData;
   ctx.fillStyle = '#111'; ctx.fillRect(0, 0, W, H);
 
-  // High Platforms
+  // Platforms
   ctx.fillStyle = '#0f9a86'; ctx.fillRect(0, 280, 320, 300); ctx.fillRect(W - 320, 280, 320, 300);
   ctx.fillStyle = '#050508'; ctx.fillRect(320, 280, W - 640, 360);
 
@@ -747,10 +729,10 @@ function drawStage3() {
   ctx.strokeStyle = '#d4a259'; ctx.lineWidth = 12;
   ctx.beginPath(); ctx.moveTo(50, 330); ctx.lineTo(W - 50, 330); ctx.stroke();
 
-  // Guillotine marker
+  // Center Marker
   ctx.fillStyle = '#e0213b'; ctx.fillRect(W/2 + centerShift - 6, 310, 12, 40);
 
-  // Teams
+  // Players
   for (let i = 0; i < 4; i++) {
     ctx.fillStyle = i === 0 ? '#ffd84a' : '#fff';
     ctx.beginPath(); ctx.arc(260 - i * 50 + centerShift, 320, 15, 0, 7); ctx.fill();
@@ -759,7 +741,6 @@ function drawStage3() {
   }
 
   if (d.phase === 'match') {
-    // Rhythm Timing Bar
     const barW = 400, barH = 26, bx = W/2 - barW/2, by = 100;
     ctx.fillStyle = '#222'; ctx.fillRect(bx, by, barW, barH);
     ctx.fillStyle = '#12a150';
@@ -771,9 +752,9 @@ function drawStage3() {
     ctx.fillStyle = '#ffd84a'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(`PULL ROUND ${d.roundsWon + 1} OF ${d.requiredRounds}`, W/2, 65);
   } else {
-    ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(W/2 - 220, 120, 440, 50);
-    ctx.fillStyle = '#12a150'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText("MATCH WON! WAITING FOR OTHER TEAMS...", W/2, 152);
+    ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fillRect(W/2 - 220, 110, 440, 50);
+    ctx.fillStyle = '#12a150'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText("MATCH WON! WAITING FOR OTHER TEAMS TO FINISH...", W/2, 142);
   }
 
   $('status-pill').textContent = d.ropeX > 0 ? "PULLING AHEAD!" : "BEING PULLED!";
@@ -781,16 +762,16 @@ function drawStage3() {
 }
 
 function initStage4() {
-  const rivalNpc = NPC_PRESETS[3]; // Gerard
+  const rivalName = PRESET_FILES[3]; // Gerard
   stageData = {
     name: 'Marbles',
     yourMarbles: 10,
     rivalMarbles: 10,
-    rivalName: rivalNpc.name,
-    rivalImg: loadedJpegImgs[rivalNpc.name],
+    rivalName: rivalName.charAt(0).toUpperCase() + rivalName.slice(1),
+    rawRivalName: rivalName,
     rivalChoice: Math.random() < 0.5 ? 'ODD' : 'EVEN',
     roundsPlayed: 0,
-    outcomeText: `Betting against ${rivalNpc.name}! Guess ODD or EVEN.`
+    outcomeText: `Betting against ${rivalName}! Guess ODD or EVEN.`
   };
   timer = 45;
   $('action-btn').style.display = "none";
@@ -835,14 +816,18 @@ function drawStage4() {
   ctx.fillStyle = '#7a5a3a'; ctx.fillRect(100, 140, W - 200, H - 240);
   ctx.strokeStyle = '#4a331c'; ctx.lineWidth = 8; ctx.strokeRect(100, 140, W - 200, H - 240);
 
-  // Rival Image / Badge
+  // Rival Image / Avatar Fallback
   ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc((3*W)/4, 220, 35, 0, 7); ctx.fill();
-  if (d.rivalImg) {
+  const asset = npcImages[d.rawRivalName];
+  if (asset && asset.loaded) {
     ctx.save(); ctx.beginPath(); ctx.arc((3*W)/4, 220, 32, 0, 7); ctx.clip();
-    ctx.drawImage(d.rivalImg, (3*W)/4 - 32, 220 - 32, 64, 64); ctx.restore();
+    ctx.drawImage(asset.img, (3*W)/4 - 32, 220 - 32, 64, 64); ctx.restore();
+  } else {
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(d.rivalName.charAt(0), (3*W)/4, 227);
   }
 
-  // UI Stats
+  // Stats
   ctx.fillStyle = '#ffd84a'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'center';
   ctx.fillText(`YOUR MARBLES: ${d.yourMarbles}`, W/4, 80);
   ctx.fillStyle = '#ff0055';
@@ -851,7 +836,7 @@ function drawStage4() {
   ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
   ctx.fillText(d.outcomeText, W/2, H - 40);
 
-  // Choice Box
+  // Choice UI Box
   ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(W/2 - 180, 160, 360, 90);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 16px sans-serif';
   ctx.fillText("TAP SCREEN: ODD (LEFT) | EVEN (RIGHT)", W/2, 212);
@@ -874,8 +859,7 @@ function initStage5() {
     name: 'Glass Bridge',
     step: 0,
     totalSteps: 12,
-    pairs: pairs,
-    turnNpcIndex: 0
+    pairs: pairs
   };
   timer = 50;
   $('action-btn').style.display = "none";
@@ -912,12 +896,12 @@ function drawStage5() {
   ctx.strokeStyle = '#151525'; ctx.lineWidth = 1;
   for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
 
-  // Bridge Beams
+  // Beams
   ctx.strokeStyle = '#445'; ctx.lineWidth = 6;
   ctx.beginPath(); ctx.moveTo(W/2 - 100, 0); ctx.lineTo(W/2 - 100, H); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(W/2 + 100, 0); ctx.lineTo(W/2 + 100, H); ctx.stroke();
 
-  // Draw Glass Panels
+  // Glass Panels
   for (let i = 0; i < d.totalSteps; i++) {
     const py = H - 100 - i * 42;
     const p = d.pairs[i];
@@ -943,13 +927,16 @@ function drawStage5() {
 }
 
 function initStage6() {
-  const boss = NPC_PRESETS[0]; // Hanbo
+  const boss = PRESET_FILES[0]; // Hanbo
   stageData = {
     name: 'Squid Game (Final)',
     player: { x: W/2, y: H - 90, speed: 180 },
-    rival: { x: W/2, y: 220, speed: 130, name: boss.name, img: loadedJpegImgs[boss.name] },
-    headCircle: { x: W/2, y: 110, r: 35 },
-    bossPhase: 1
+    rival: { 
+      x: W/2, y: 220, speed: 130, 
+      name: boss.charAt(0).toUpperCase() + boss.slice(1), 
+      rawName: boss 
+    },
+    headCircle: { x: W/2, y: 110, r: 35 }
   };
   timer = 45;
   $('action-btn').textContent = "HOLD TO ADVANCE TO HEAD ZONE";
@@ -965,7 +952,7 @@ function updateStage6(dt) {
     d.player.y -= d.player.speed * dt;
   }
 
-  // Guard Rival Defense AI
+  // Rival Defense Movement
   if (d.player.y < d.rival.y + 140) {
     if (d.rival.x < d.player.x) d.rival.x += d.rival.speed * dt;
     else d.rival.x -= d.rival.speed * dt;
@@ -981,7 +968,7 @@ function updateStage6(dt) {
 
   const headDist = Math.hypot(d.player.x - d.headCircle.x, d.player.y - d.headCircle.y);
   if (headDist < d.headCircle.r) {
-    announceElimination(d.rival.name, 001);
+    announceElimination(d.rival.name, 1);
     winGame();
   }
 
@@ -998,11 +985,15 @@ function drawStage6() {
   ctx.beginPath(); ctx.moveTo(W/2 - 120, 240); ctx.lineTo(W/2 + 120, 240); ctx.lineTo(W/2, 130); ctx.closePath(); ctx.stroke();
   ctx.beginPath(); ctx.arc(d.headCircle.x, d.headCircle.y, d.headCircle.r, 0, 7); ctx.stroke();
 
-  // Boss Rival
+  // Boss Guard Rival
   ctx.fillStyle = '#ed1b76'; ctx.beginPath(); ctx.arc(d.rival.x, d.rival.y, 16, 0, 7); ctx.fill();
-  if (d.rival.img) {
+  const asset = npcImages[d.rival.rawName];
+  if (asset && asset.loaded) {
     ctx.save(); ctx.beginPath(); ctx.arc(d.rival.x, d.rival.y, 14, 0, 7); ctx.clip();
-    ctx.drawImage(d.rival.img, d.rival.x - 14, d.rival.y - 14, 28, 28); ctx.restore();
+    ctx.drawImage(asset.img, d.rival.x - 14, d.rival.y - 14, 28, 28); ctx.restore();
+  } else {
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(d.rival.name.charAt(0), d.rival.x, d.rival.y + 4);
   }
   ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; 
   ctx.fillText(d.rival.name, d.rival.x, d.rival.y + 26);
@@ -1027,11 +1018,14 @@ cv.addEventListener('pointerdown', (e) => {
     const target = d.path[targetIdx];
     const dist = Math.hypot(clickX - target.x, clickY - target.y);
 
-    if (dist < 45) {
+    if (dist < 50) {
       d.progress += 0.09;
       d.cursor = { x: target.x, y: target.y };
       tone(440, 0.05);
-      if (d.progress >= 0.98) completeStage(160);
+      if (d.progress >= 0.98) {
+        d.youFinished = true;
+        setTimeout(() => completeStage(160), 2000);
+      }
     } else {
       d.tension += 0.22;
       tone(150, 0.1, 'sawtooth');
@@ -1139,7 +1133,7 @@ function openMainMenu() {
   showOverlay('ov-menu');
 }
 
-// UI Handlers
+// UI Overlay Button Event Handlers
 $('btn-start').addEventListener('click', () => startStage(1));
 $('btn-how').addEventListener('click', () => showOverlay('ov-how'));
 $('btn-close-how').addEventListener('click', () => showOverlay('ov-menu'));
@@ -1149,7 +1143,6 @@ $('btn-win-menu').addEventListener('click', openMainMenu);
 $('btn-loss-menu').addEventListener('click', openMainMenu);
 $('home-btn').addEventListener('click', openMainMenu);
 
-// Main Animation Loop
 let lastT = 0;
 function loop(t) {
   const dt = Math.min(0.05, (t - lastT) / 1000 || 0);
@@ -1162,7 +1155,7 @@ function loop(t) {
     else if (currentStage === 4) { updateStage4(dt); drawStage4(); }
     else if (currentStage === 5) { updateStage5(dt); drawStage5(); }
     else if (currentStage === 6) { updateStage6(dt); drawStage6(); }
-    updateHUD();
+ updateHUD();
   }
 
   requestAnimationFrame(loop);
