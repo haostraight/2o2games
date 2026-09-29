@@ -295,10 +295,11 @@ const W = 900, H = 640;
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 const $ = id => document.getElementById(id);
 
+// Match exact directory list provided in image
 const PRESET_FILES = [
-  'Hanbo', 'asher', 'callum', 'gerard', 'guangyan', 
-  'ivan', 'jason', 'liu-ji', 'matthew', 'travia', 
-  'travis', 'winston', 'xayven', 'xuchen', 'yichen'
+  'asher', 'callum', 'gerard', 'guangyan', 
+  'ivan', 'jayden', 'linus', 'longyang', 
+  'travis', 'winston', 'xayven', 'yichen'
 ];
 
 const npcImages = {};
@@ -365,7 +366,7 @@ function initStage1() {
   
   PRESET_FILES.forEach((name, i) => {
     players.push({
-      x: 50 + i * (W - 100) / 15,
+      x: 60 + i * (W - 120) / (PRESET_FILES.length - 1 || 1),
       y: START + Math.random() * 16 - 8,
       you: false,
       name: name.charAt(0).toUpperCase() + name.slice(1),
@@ -380,14 +381,14 @@ function initStage1() {
     });
   });
 
-  // Player 456 (YOU) - Center position, Golden badge, NO photo
-  players.splice(7, 0, {
+  // Player 456 (YOU) - Center position
+  players.splice(6, 0, {
     x: W / 2,
     y: START,
     you: true,
     name: 'Player 456',
     num: 456,
-    speed: 105,
+    speed: 110,
     st: 'alive',
     delay: 0,
     was: false,
@@ -435,7 +436,9 @@ function updateStage1(dt) {
 
   const youPlayer = d.players.find(p => p.you);
 
-  // Update ALL players continuously (MUST WAIT for everyone to finish)
+  // Fast-forward NPCs when Player 456 reaches safety
+  const npcSpeedMultiplier = (youPlayer && youPlayer.st === 'safe') ? 2.5 : 1.0;
+
   d.players.forEach(p => {
     if (p.st !== 'alive') return;
     let mv = p.you ? held : (d.phase === 'green' ? (d.phaseT >= p.goAt) : (p.was && d.phaseT < p.delay));
@@ -447,11 +450,11 @@ function updateStage1(dt) {
       soundShot();
       announceElimination(p.name, p.num);
       totalAlive--;
-      if (p.you) { d.endT = 1.2; d.reason = 'Shot for moving on Red Light!'; }
+      if (p.you) { d.endT = 1.0; d.reason = 'Shot for moving on Red Light!'; }
     }
 
     if (mv && p.st === 'alive') {
-      p.y -= p.speed * dt;
+      p.y -= p.speed * dt * (p.you ? 1.0 : npcSpeedMultiplier);
       p.ph += dt * 12;
       if (p.y <= 125) {
         p.y = 125; p.st = 'safe';
@@ -461,22 +464,23 @@ function updateStage1(dt) {
     p.mv = mv;
   });
 
-  // Check if round is completely done (All players either safe or dead, or time run out)
+  // Check if round finished or time expired
   const activePlayers = d.players.filter(p => p.st === 'alive');
-  if (activePlayers.length === 0 || timer <= 0) {
-    if (timer <= 0) {
-      d.players.forEach(p => {
-        if (p.st === 'alive' && p.y > 125) {
-          p.st = 'dead';
-          announceElimination(p.name, p.num);
-          totalAlive--;
-          if (p.you) d.reason = 'Time expired before reaching finish line!';
-        }
-      });
-    }
 
+  if (timer <= 0) {
+    d.players.forEach(p => {
+      if (p.st === 'alive' && p.y > 125) {
+        p.st = 'dead';
+        announceElimination(p.name, p.num);
+        totalAlive--;
+        if (p.you) d.reason = 'Time expired before reaching finish line!';
+      }
+    });
+  }
+
+  if (activePlayers.length === 0 || timer <= 0 || (youPlayer && youPlayer.st === 'safe' && activePlayers.length <= 1)) {
     if (d.endT === null) {
-      d.endT = 1.0;
+      d.endT = 0.8;
       if (youPlayer.st === 'safe') d.reason = 'safe';
       else if (!d.reason) d.reason = 'Eliminated during Red Light!';
     }
