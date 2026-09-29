@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Red Light, Green Light</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --pink: #ed1b76;
+  --pink-dark: #9c0f4f;
+  --teal: #0f9a86;
+  --teal-dark: #075248;
+  --ink: #15151a;
+  --gold: #f7d64a;
+  --gold-dark: #b89614;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  background: var(--ink);
+  color: #fff;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+#wrap {
+  position: relative;
+  width: min(100vw, 900px);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+#hud {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100vw, 900px);
+  padding: 12px 16px;
+  font-size: 15px;
+}
+
+#hud b {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+#light {
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  background: #333;
+  min-width: 150px;
+  text-align: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+#light.g { background: #12a150; transform: scale(1.03); }
+#light.r { background: #e0213b; transform: scale(1.03); }
+
+#run {
+  width: min(92vw, 600px);
+  margin: 12px 0 22px;
+  padding: 20px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--pink);
+  color: #fff;
+  font: 900 24px "Trebuchet MS", Verdana, sans-serif;
+  touch-action: none;
+  box-shadow: 0 6px 0 var(--pink-dark);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+#run:active, #run.on {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--pink-dark);
+}
+
+/* Overlays */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 15, 26, 0.94);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  gap: 16px;
+  border-radius: 12px;
+  z-index: 10;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.overlay.hide {
+  display: none !important;
+}
+
+/* Victory styling */
+.overlay.victory {
+  background: rgba(10, 30, 20, 0.95);
+  border: 2px solid var(--gold);
+}
+
+.overlay.victory h1 {
+  color: var(--gold) !important;
+  text-shadow: 0 0 15px rgba(247, 214, 74, 0.5);
+}
+
+/* Defeat styling */
+.overlay.defeat {
+  background: rgba(30, 10, 15, 0.95);
+  border: 2px solid #e0213b;
+}
+
+.overlay.defeat h1 {
+  color: #e0213b !important;
+  text-shadow: 0 0 15px rgba(224, 33, 59, 0.5);
+}
+
+.squid-shapes {
+  font-size: 36px;
+  letter-spacing: .4em;
+  color: var(--pink);
+}
+
+.btn-primary {
+  padding: 14px 38px;
+  border: 3px solid var(--pink);
+  border-radius: 10px;
+  background: var(--pink);
+  color: #fff;
+  font: 900 18px "Trebuchet MS", Verdana, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(237, 27, 118, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #ff2a89;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(237, 27, 118, 0.6);
+}
+
+.btn-secondary {
+  padding: 12px 28px;
+  border: 2px solid #666;
+  border-radius: 10px;
+  background: transparent;
+  color: #ccc;
+  font: 800 16px "Trebuchet MS", Verdana, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #fff;
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+/* Home button on HUD */
+#home-btn {
+  background: #2a2a35;
+  border: 1px solid #444;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#home-btn:hover {
+  background: #3a3a48;
+}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <button id="home-btn" title="Exit to Main Menu">🏠 MENU</button>
+  <div id="light">READY</div>
+  <div>Time <b id="time">45</b>s</div>
+  <div>Alive <b id="alive">16</b></div>
+  <div>Safe <b id="safe">0</b></div>
+</div>
+
+<div id="wrap">
+  <canvas id="c" width="900" height="640"></canvas>
+  
+  <!-- Main Menu Overlay -->
+  <div id="ov-menu" class="overlay">
+    <div class="squid-shapes">○ △ □</div>
+    <h1 class="text-4xl sm:text-5xl font-black text-[var(--pink)] tracking-wider my-1">RED LIGHT<br>GREEN LIGHT</h1>
+    
+    <div class="bg-black/40 p-4 rounded-xl max-w-md text-left text-sm text-gray-300 space-y-2 border border-white/10 my-2">
+      <div class="font-bold text-white text-base mb-1 border-b border-gray-700 pb-1">📜 How to Play:</div>
+      <p>• <b>Hold</b> <span class="bg-gray-800 px-2 py-0.5 rounded text-pink-400">Space</span>, <span class="bg-gray-800 px-2 py-0.5 rounded text-pink-400">W</span>, <span class="bg-gray-800 px-2 py-0.5 rounded text-pink-400">↑ Arrow</span> or the <span class="bg-pink-600 px-2 py-0.5 rounded text-white">PINK BUTTON</span> to run.</p>
+      <p>• Move ONLY during <span class="text-green-400 font-bold">GREEN LIGHT</span> while the doll looks away.</p>
+      <p>• <b>STOP IMMEDIATELY</b> when the doll turns for <span class="text-red-400 font-bold">RED LIGHT</span>!</p>
+      <p>• Cross the red finish line before the timer reaches 0.</p>
+    </div>
+
+    <button id="btn-start" class="btn-primary mt-2">START GAME</button>
+  </div>
+
+  <!-- Win Overlay -->
+  <div id="ov-win" class="overlay victory hide">
+    <div class="squid-shapes text-yellow-400">○ ○ ○</div>
+    <h1 class="text-4xl sm:text-6xl font-black">YOU SURVIVED!</h1>
+    
+    <div class="bg-black/50 p-5 rounded-xl min-w-[280px] border border-yellow-500/30 text-left my-2 space-y-2">
+      <div class="text-center font-bold text-yellow-400 text-lg border-b border-yellow-500/20 pb-1">GAME SUMMARY</div>
+      <div class="flex justify-between"><span>Time Left:</span> <b id="win-time" class="text-green-400">0s</b></div>
+      <div class="flex justify-between"><span>Survivors:</span> <b id="win-survivors" class="text-yellow-400">0 / 16</b></div>
+      <div class="flex justify-between"><span>Status:</span> <b class="text-green-400">PASSED TO ROUND 2</b></div>
+    </div>
+
+    <div class="flex gap-4 mt-2">
+      <button id="btn-win-replay" class="btn-primary">PLAY AGAIN</button>
+      <button id="btn-win-menu" class="btn-secondary">MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- Loss Overlay -->
+  <div id="ov-loss" class="overlay defeat hide">
+    <div class="squid-shapes text-red-500">✕ ✕ ✕</div>
+    <h1 class="text-4xl sm:text-6xl font-black">ELIMINATED</h1>
+    
+    <p id="loss-reason" class="text-lg text-red-200 font-semibold max-w-md">You moved during Red Light!</p>
+
+    <div class="bg-black/50 p-4 rounded-xl min-w-[260px] border border-red-500/30 text-left my-1 space-y-1 text-sm">
+      <div class="flex justify-between"><span>Other Survivors:</span> <b id="loss-survivors" class="text-white">0 / 16</b></div>
+    </div>
+
+    <div class="flex gap-4 mt-4">
+      <button id="btn-loss-retry" class="btn-primary">TRY AGAIN</button>
+      <button id="btn-loss-menu" class="btn-secondary">MAIN MENU</button>
+    </div>
+  </div>
+</div>
+
+<button id="run">HOLD TO RUN</button>
+
+<script>
+const W=900, H=640, FINISH=125, START=H-85, TIME=45, GRACE=0.35;
+
+const FILES=['Hanbo','asher','callum','gerard','guangyan','ivan','jason','liu-ji','matthew','travia','travis','winston','xayven','xuchen','yichen'];
+const label=f=>f.split('-').map(s=>s[0].toUpperCase()+s.slice(1)).join('-');
+const imgs={};
+FILES.forEach(f=>{
+  const i=new Image();
+  i.src='images/'+f+'.jpeg';
+  imgs[f]=i;
+});
+
+const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+
+let P=[], phase='idle', phaseT=0, phaseDur=0, redT=0, headTurn=0, timeLeft=TIME, held=false, beams=[], flash=0, endT=null, running=false, reason='';
+
+// Web Audio API Synth Sounds
+let ac;
+function initAudio() {
+  if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function tone(f, d, type='sine', v=0.08) {
+  if(!ac) return;
+  try {
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type=type;
+    o.frequency.value=f;
+    g.gain.setValueAtTime(v, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+d);
+    o.connect(g);
+    g.connect(ac.destination);
+    o.start();
+    o.stop(ac.currentTime+d);
+  } catch(e){}
+}
+
+const shot=()=>{
+  tone(90,.25,'sawtooth',.25);
+  tone(55,.3,'square',.15);
+};
+
+// Setup Game State
+function init(){
+  const slots=FILES.map(f=>({f})).concat([{you:true}]);
+  for(let i=slots.length-1; i>0; i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [slots[i], slots[j]]=[slots[j], slots[i]];
+  }
+  const used=new Set([456]);
+  
+  P=slots.map((s,i)=>{
+    let n=456;
+    if(!s.you){
+      do { n=1+Math.floor(Math.random()*455); } while(used.has(n));
+      used.add(n);
+    }
+    return {
+      x: 50 + i*(W-100)/(slots.length-1),
+      y: START + Math.random()*16 - 8,
+      you: !!s.you,
+      name: s.you ? 'YOU' : label(s.f),
+      img: s.f ? imgs[s.f] : null,
+      num: n,
+      speed: s.you ? 108 : 82 + Math.random()*28,
+      skill: .3 + Math.random()*.8,
+      st: 'alive',
+      mv: false,
+      delay: 0,
+      goAt: 0,
+      restT: 0,
+      ph: Math.random()*6,
+      was: false
+    };
+  });
+
+  phase='green'; phaseT=0; phaseDur=3+Math.random()*1.5;
+  redT=0; headTurn=0; timeLeft=TIME; beams=[]; flash=0;
+  endT=null; held=false; reason=''; running=true;
+}
+
+function startRed(){
+  phase='red'; phaseT=0; redT=0; phaseDur=2.2+Math.random()*1.6;
+  tone(220, .35, 'square', .09);
+  P.forEach(p => {
+    p.was = p.mv;
+    p.delay = .05 + p.skill * Math.random() * .55;
+  });
+}
+
+function startGreen(){
+  phase='green'; phaseT=0; phaseDur=1.8+Math.random()*2.7;
+  tone(660, .15);
+  P.forEach(p => {
+    p.goAt = Math.random() * .5;
+    p.restT = 0;
+  });
+}
+
+function kill(p){
+  p.st='dead';
+  beams.push({x:p.x, y:p.y, t:.3});
+  flash=.5;
+  shot();
+  if(p.you){
+    endT=1.4;
+    reason='shot';
+  }
+}
+
+function update(dt){
+  if(!running) return;
+
+  timeLeft -= dt;
+  phaseT += dt;
+
+  if(phase === 'green'){
+    if(phaseT >= phaseDur) startRed();
+  } else {
+    redT += dt;
+    if(phaseT >= phaseDur) startGreen();
+  }
+
+  headTurn += Math.max(-dt/.3, Math.min(dt/.3, (phase==='red'?1:0) - headTurn));
+
+  for(const p of P){
+    if(p.st !== 'alive') continue;
+
+    let mv;
+    if(p.you) mv = held;
+    else if(phase === 'green'){
+      if(p.restT > 0){
+        p.restT -= dt;
+        mv = false;
+      } else {
+        mv = phaseT >= p.goAt;
+        if(mv && Math.random() < dt*.3) p.restT = .3 + Math.random()*.5;
+      }
+    } else {
+      mv = p.was && redT < p.delay;
+    }
+
+    if(phase === 'red' && redT > GRACE && mv){
+      kill(p);
+      p.mv = false;
+      continue;
+    }
+
+    if(mv){
+      p.y -= p.speed * dt;
+      p.ph += dt * 12;
+      if(p.y <= FINISH + 8){
+        p.y = FINISH + 8;
+        p.st = 'safe';
+        mv = false;
+        tone(880, .12, 'triangle', .07);
+        if(p.you){
+          endT = 1.0;
+          reason = 'safe';
+        }
+      }
+    }
+    p.mv = mv;
+  }
+
+  // Time limit expired logic
+  if(timeLeft <= 0 && running && endT === null){
+    timeLeft = 0;
+    P.forEach(p => {
+      if(p.st === 'alive'){
+        p.st = 'dead';
+        if(p.you) reason = 'time';
+      }
+    });
+    if(reason !== 'safe') reason = reason || 'time';
+    endT = endT ?? 1.2;
+  }
+
+  for(const b of beams) b.t -= dt;
+  beams = beams.filter(b => b.t > 0);
+  flash = Math.max(0, flash - dt*1.5);
+
+  if(endT !== null){
+    endT -= dt;
+    if(endT <= 0) finish();
+  }
+}
+
+function finish(){
+  running = false;
+  endT = null;
+  const safeCount = P.filter(p => p.st === 'safe').length;
+
+  if(reason === 'safe'){
+    $('win-time').textContent = Math.ceil(Math.max(0, timeLeft)) + 's';
+    $('win-survivors').textContent = safeCount + ' / ' + P.length;
+    showOverlay('ov-win');
+  } else {
+    $('loss-reason').textContent = reason === 'time' 
+      ? 'Time ran out before reaching the finish line!' 
+      : 'You moved while the doll was looking!';
+    $('loss-survivors').textContent = safeCount + ' / ' + P.length;
+    showOverlay('ov-loss');
+  }
+}
+
+function drawBG(){
+  ctx.fillStyle='#d9b382'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(120,80,40,.08)';
+  for(let y=FINISH+20; y<H; y+=28) ctx.fillRect(0,y,W,2);
+
+  const g=ctx.createLinearGradient(0,0,0,FINISH);
+  g.addColorStop(0,'#8fd3e8'); g.addColorStop(1,'#f4a6c0');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,FINISH-8);
+
+  ctx.fillStyle='rgba(255,255,255,.2)';
+  for(let x=0; x<W; x+=60) ctx.fillRect(x,0,30,FINISH-8);
+
+  for(let x=0; x<W; x+=24){
+    ctx.fillStyle=(x/24)%2?'#fff':'#e0213b';
+    ctx.fillRect(x,FINISH-8,24,8);
+  }
+
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.fillRect(0,START+38,W,4);
+  ctx.fillStyle='rgba(0,0,0,.3)';
+  ctx.font='bold 13px Trebuchet MS,sans-serif';
+  ctx.textAlign='left';
+  ctx.fillText('START LINE', 10, START+56);
+}
+
+function drawDoll(){
+  const cx = W/2;
+  ctx.fillStyle='#f0842c'; ctx.beginPath(); ctx.moveTo(cx-32,FINISH-14); ctx.lineTo(cx+32,FINISH-14); ctx.lineTo(cx+14,50); ctx.lineTo(cx-14,50); ctx.fill();
+  ctx.fillStyle='#f7d64a'; ctx.fillRect(cx-15,44,30,14);
+
+  const sx=Math.max(.05, Math.abs(Math.cos(Math.PI*headTurn)));
+  ctx.save(); ctx.translate(cx,28); ctx.scale(sx,1);
+  ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(0,0,23,0,7); ctx.fill();
+
+  if(headTurn>=.5){
+    ctx.fillStyle='#f2c9a0'; ctx.beginPath(); ctx.ellipse(0,5,18,17,0,0,7); ctx.fill();
+    ctx.fillStyle='rgba(240,120,150,.7)'; [-12,12].forEach(x=>{ctx.beginPath();ctx.arc(x,10,3.5,0,7);ctx.fill();});
+    ctx.fillStyle=headTurn>.9?'#ff1a3c':'#111';
+    ctx.shadowColor='#f00'; ctx.shadowBlur=headTurn>.9?12:0;
+    [-7,7].forEach(x=>{ctx.beginPath();ctx.arc(x,3,3,0,7);ctx.fill();});
+  }
+  ctx.restore();
+}
+
+function rr(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.roundRect(x,y,w,h,r);
+}
+
+function drawP(p){
+  const bob = p.st==='alive' && p.mv ? -Math.abs(Math.sin(p.ph))*3 : 0;
+  const x=p.x, y=p.y+bob, r=17, hy=y-6, leg=p.mv?Math.sin(p.ph)*5:0;
+
+  ctx.globalAlpha = p.st==='dead' ? 0.75 : 1;
+
+  ctx.fillStyle='rgba(0,0,0,.2)'; ctx.beginPath(); ctx.ellipse(x,p.y+32,17,6,0,0,7); ctx.fill();
+  ctx.fillStyle='#0a6b5f'; ctx.fillRect(x-9,y+20+leg,7,12); ctx.fillRect(x+2,y+20-leg,7,12);
+  ctx.fillStyle=p.st==='dead'?'#5d7d78':'#0f9a86'; rr(x-16,y+2,32,24,8); ctx.fill();
+  ctx.fillStyle='#fff'; rr(x-10,y+10,20,12,3); ctx.fill();
+  ctx.fillStyle='#111'; ctx.font='bold 9px Trebuchet MS,sans-serif'; ctx.textAlign='center'; ctx.fillText(p.num,x,y+19.5);
+
+  ctx.save(); ctx.beginPath(); ctx.arc(x,hy,r,0,7); ctx.clip();
+  const im=p.img;
+  if(im && im.complete && im.naturalWidth){
+    const s=Math.max(2*r/im.naturalWidth, 2*r/im.naturalHeight), w=im.naturalWidth*s, h=im.naturalHeight*s;
+    ctx.drawImage(im, x-w/2, hy-r-(h-2*r)*.3, w, h);
+  } else {
+    ctx.fillStyle=p.you?'#f2c9a0':'#777'; ctx.fillRect(x-r,hy-r,2*r,2*r);
+    ctx.fillStyle='#222';
+    if(p.you){
+      ctx.beginPath(); ctx.arc(x-5,hy-1,2,0,7); ctx.arc(x+5,hy-1,2,0,7); ctx.fill();
+      ctx.fillRect(x-8,hy+6,16,2);
+    } else {
+      ctx.font='bold 14px sans-serif'; ctx.fillText(p.name[0],x,hy+5);
+    }
+  }
+  ctx.restore();
+
+  ctx.lineWidth=3;
+  ctx.strokeStyle = p.you ? '#ffd84a' : (p.st==='safe' ? '#7CFFB2' : '#fff');
+  ctx.beginPath(); ctx.arc(x,hy,r,0,7); ctx.stroke();
+
+  if(p.st==='dead'){
+    ctx.fillStyle='rgba(20,20,20,.5)'; ctx.beginPath(); ctx.arc(x,hy,r,0,7); ctx.fill();
+    ctx.strokeStyle='#e0213b'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(x-10,hy-10); ctx.lineTo(x+10,hy+10); ctx.moveTo(x+10,hy-10); ctx.lineTo(x-10,hy+10); ctx.stroke();
+  }
+
+  ctx.globalAlpha=1;
+  ctx.font='bold 11px Trebuchet MS,sans-serif'; ctx.textAlign='center'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)';
+  ctx.strokeText(p.name,x,p.y+46); ctx.fillStyle=p.you?'#ffd84a':'#fff'; ctx.fillText(p.name,x,p.y+46);
+
+  if(p.you && p.st==='alive'){
+    ctx.fillStyle='#ffd84a';
+    const b=Math.sin(performance.now()/200)*3;
+    ctx.beginPath(); ctx.moveTo(x-6,hy-r-14+b); ctx.lineTo(x+6,hy-r-14+b); ctx.lineTo(x,hy-r-6+b); ctx.fill();
+  }
+}
+
+function draw(){
+  drawBG();
+  drawDoll();
+  P.slice().sort((a,b)=>a.y-b.y).forEach(drawP);
+
+  if(headTurn>0){
+    ctx.fillStyle='rgba(255,0,40,'+(.14*headTurn)+')';
+    ctx.fillRect(0,0,W,H);
+  }
+
+  for(const b of beams){
+    ctx.strokeStyle='rgba(255,40,60,'+(b.t/.3)+')';
+    ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(W/2,30); ctx.lineTo(b.x,b.y-6); ctx.stroke();
+  }
+
+  if(flash>0){
+    ctx.fillStyle='rgba(255,255,255,'+flash*.5+')';
+    ctx.fillRect(0,0,W,H);
+  }
+
+  // HUD sync
+  const L=$('light');
+  if(!running && phase==='idle'){
+    L.textContent='READY'; L.className='';
+  } else if(phase==='red'){
+    L.textContent='RED LIGHT'; L.className='r';
+  } else {
+    L.textContent='GREEN LIGHT'; L.className='g';
+  }
+
+  $('time').textContent=Math.ceil(Math.max(0,timeLeft));
+  $('alive').textContent=P.filter(p=>p.st==='alive').length;
+  $('safe').textContent=P.filter(p=>p.st==='safe').length;
+}
+
+function showOverlay(id) {
+  document.querySelectorAll('.overlay').forEach(el => el.classList.add('hide'));
+  if (id) $(id).classList.remove('hide');
+}
+
+function openMainMenu() {
+  running = false;
+  phase = 'idle';
+  showOverlay('ov-menu');
+}
+
+function startGame() {
+  initAudio();
+  showOverlay(null);
+  init();
+}
+
+// Input bindings
+const hold = v => {
+  held = v;
+  $('run').classList.toggle('on', v);
+};
+
+addEventListener('keydown', e => {
+  if(['Space','ArrowUp','KeyW'].includes(e.code)) {
+    hold(true);
+    e.preventDefault();
+  }
+});
+
+addEventListener('keyup', e => {
+  if(['Space','ArrowUp','KeyW'].includes(e.code)) hold(false);
+});
+
+[$('run'), cv].forEach(el => {
+  el.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    hold(true);
+  });
+});
+
+addEventListener('pointerup', () => hold(false));
+addEventListener('pointercancel', () => hold(false));
+addEventListener('blur', () => hold(false));
+
+// UI Button actions
+$('btn-start').addEventListener('click', startGame);
+$('btn-win-replay').addEventListener('click', startGame);
+$('btn-win-menu').addEventListener('click', openMainMenu);
+$('btn-loss-retry').addEventListener('click', startGame);
+$('btn-loss-menu').addEventListener('click', openMainMenu);
+$('home-btn').addEventListener('click', openMainMenu);
+
+// Animation Loop
+let last=0;
+function loop(t){
+  const dt=Math.min(.05, (t-last)/1000 || 0);
+  last=t;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+openMainMenu();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
